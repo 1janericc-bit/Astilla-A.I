@@ -1,0 +1,6 @@
+{
+  "name": "Astilla A.I",
+  "description": "An intelligent, free-to-use, offline-first AI assistant developed by Astilla Softwares featuring interactive training, document summarization, persistent memory, and customizable themes.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
