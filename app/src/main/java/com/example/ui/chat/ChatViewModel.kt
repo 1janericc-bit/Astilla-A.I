@@ -43,16 +43,20 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
     init {
         // Seed initial friendly message if chat is empty
         viewModelScope.launch {
-            val existing = chatDao.getAllMessages().first()
-            if (existing.isEmpty()) {
-                chatDao.insertMessage(
-                    ChatMessageEntity(
-                        role = "assistant",
-                        content = "Hello! I am **Astilla A.I**, your free, intelligent, and offline-first personal assistant developed by **Astilla Softwares**.\n\n" +
-                                "I have out-of-the-box conversational intelligence and grow smarter through your training documents and context memory. How can I assist you today?",
-                        isOffline = true
+            try {
+                val existing = chatDao.getAllMessages().first()
+                if (existing.isEmpty()) {
+                    chatDao.insertMessage(
+                        ChatMessageEntity(
+                            role = "assistant",
+                            content = "Hello! I am **Astilla A.I**, your free, intelligent, and offline-first personal assistant developed by **Astilla Softwares**.\n\n" +
+                                    "I have out-of-the-box conversational intelligence and grow smarter through your training documents and context memory. How can I assist you today?",
+                            isOffline = true
+                        )
                     )
-                )
+                }
+            } catch (e: Exception) {
+                android.util.Log.e("ChatViewModel", "Error checking/seeding initial message", e)
             }
         }
     }
