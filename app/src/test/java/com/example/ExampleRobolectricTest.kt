@@ -57,4 +57,39 @@ class ExampleRobolectricTest {
         )
         assertTrue(summary.contains("Executive Summary"))
     }
+
+    @Test
+    fun `verify offline RAG pipeline response generation`() {
+        val learnedText = """
+            Astilla Softwares was founded to build decentralized and offline-first intelligence.
+            The flagship system is called Astilla A.I which operates entirely on-device.
+            It uses local neural parsing to extract clean text from PDF documents.
+        """.trimIndent()
+
+        val question = "What is the flagship system called?"
+        val answer = AstillaBrainEngine.generateOfflineResponse(
+            userQuestion = question,
+            learnedPdfText = learnedText
+        )
+
+        assertTrue(answer.contains("Astilla A.I", ignoreCase = true))
+    }
+
+    @Test
+    fun `verify local PDF decoding with iText`() {
+        // Create an in-memory PDF using iText
+        val outputStream = java.io.ByteArrayOutputStream()
+        val document = com.itextpdf.text.Document()
+        com.itextpdf.text.pdf.PdfWriter.getInstance(document, outputStream)
+        document.open()
+        document.add(com.itextpdf.text.Paragraph("Astilla A.I Local Document Intelligence."))
+        document.add(com.itextpdf.text.Paragraph("Page 1: Zero data leaves the user device."))
+        document.close()
+
+        val pdfBytes = outputStream.toByteArray()
+        val extractedText = com.example.ai.PdfDocumentExtractor.extractPdfTextOffline(pdfBytes)
+
+        assertTrue(extractedText.contains("Astilla A.I Local Document Intelligence"))
+        assertTrue(extractedText.contains("Zero data leaves the user device"))
+    }
 }

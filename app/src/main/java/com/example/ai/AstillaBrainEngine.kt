@@ -19,6 +19,27 @@ object AstillaBrainEngine {
     const val DEVELOPER_NAME = "Astilla Softwares"
     const val APP_NAME = "Astilla A.I"
 
+    val localModelEngine = LocalModelEngine.DEFAULT
+
+    /**
+     * Offline RAG / Context Injection Pipeline.
+     * Assembles prompt with training document content and passes to local model engine.
+     */
+    fun generateOfflineResponse(userQuestion: String, learnedPdfText: String): String {
+        val fullPrompt = """
+        System: You are Astilla A.I, an offline assistant. Answer using ONLY the training context provided below.
+
+        Training Document Content:
+        $learnedPdfText
+
+        User Question: $userQuestion
+        Answer:
+        """.trimIndent()
+
+        // Pass 'fullPrompt' to your local MediaPipe or llama.cpp instance
+        return localModelEngine.generate(fullPrompt)
+    }
+
     val SYSTEM_PROMPT = """
         You are "Astilla A.I", an intelligent, free-to-use, offline-first AI assistant developed by Astilla Softwares.
         - You possess foundational natural language understanding and conversational skills out of the box.
@@ -300,7 +321,11 @@ object AstillaBrainEngine {
 
         // 8. If a relevant knowledge capsule matched!
         if (relevantCapsule != null) {
-            val extractedAnswer = answerFromCapsule(prompt, relevantCapsule)
+            val contextText = relevantCapsule.rawText.ifBlank { relevantCapsule.coreSummary }
+            val extractedAnswer = generateOfflineResponse(
+                userQuestion = prompt,
+                learnedPdfText = contextText
+            )
             return@withContext """
                 Based on the knowledge I learned from **"${relevantCapsule.title}"**:
                 
